@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's the Time? 🕐</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #fff9f0;
+    --sun: #ffcc00;
+    --blue: #4a90d9;
+    --green: #5cb85c;
+    --red: #e85d4a;
+    --purple: #9b59b6;
+    --orange: #f0a500;
+    --card: #ffffff;
+    --shadow: rgba(74,144,217,0.18);
+    --text: #2d3a4a;
+    --muted: #8099b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--sky);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Decorative background blobs */
+  body::before {
+    content: '';
+    position: fixed;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #ffe0a0 0%, transparent 70%);
+    top: -150px; right: -100px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #b3d9ff 0%, transparent 70%);
+    bottom: -100px; left: -80px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--blue);
+    text-shadow: 3px 3px 0 rgba(74,144,217,0.15);
+    letter-spacing: 1px;
+    line-height: 1.1;
+  }
+
+  header p {
+    margin-top: 8px;
+    font-size: 1.05rem;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .progress-bar-wrap {
+    background: #dde8f5;
+    border-radius: 99px;
+    height: 14px;
+    margin: 0 auto 32px;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.07);
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Quiz card */
+  .quiz-card {
+    background: var(--card);
+    border-radius: 28px;
+    padding: 36px 32px 30px;
+    box-shadow: 0 12px 48px var(--shadow), 0 2px 8px rgba(0,0,0,0.06);
+    animation: slideUp 0.45s cubic-bezier(0.34,1.4,0.64,1) both;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--blue), var(--purple), var(--orange));
+    border-radius: 28px 28px 0 0;
+  }
+
+  .question-label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.3rem, 4vw, 1.75rem);
+    color: var(--text);
+    margin-bottom: 28px;
+    line-height: 1.3;
+  }
+
+  /* Analog Clock */
+  .clock-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .clock-svg {
+    filter: drop-shadow(0 6px 18px rgba(74,144,217,0.22));
+    border-radius: 50%;
+  }
+
+  /* Answer options */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .opt-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    padding: 18px 10px;
+    border-radius: 18px;
+    border: 3px solid #dde8f5;
+    background: #f4f9ff;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    overflow: hidden;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: #e8f2ff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(74,144,217,0.18);
+  }
+  .opt-btn.correct {
+    border-color: var(--green);
+    background: #eafaf1;
+    color: var(--green);
+    animation: correctPop 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .opt-btn.wrong {
+    border-color: var(--red);
+    background: #fff0ee;
+    color: var(--red);
+    animation: shake 0.4s;
+  }
+  .opt-btn:disabled { cursor: default; }
+
+  /* Feedback area */
+  .feedback {
+    margin-top: 22px;
+    min-height: 52px;
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    border-radius: 16px;
+    padding: 12px 20px;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .feedback.show { opacity: 1; transform: translateY(0); }
+  .feedback.good { background: #eafaf1; color: var(--green); }
+  .feedback.bad  { background: #fff0ee; color: var(--red); }
+
+  /* Next button */
+  .next-btn {
+    display: block;
+    margin: 22px auto 0;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.15rem;
+    padding: 14px 44px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: #fff;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(74,144,217,0.3);
+    transition: all 0.2s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .next-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+    animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .next-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 10px 28px rgba(74,144,217,0.38); }
+
+  /* Score screen */
+  .score-screen {
+    text-align: center;
+    padding: 20px 10px;
+  }
+  .score-screen .trophy { font-size: 5rem; animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .score-screen h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    color: var(--blue);
+    margin: 16px 0 8px;
+  }
+  .score-screen p { font-size: 1.15rem; color: var(--muted); font-weight: 700; }
+  .score-screen .score-num {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3.5rem;
+    color: var(--purple);
+    margin: 12px 0;
+  }
+  .restart-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--orange), var(--red));
+    color: #fff;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    margin-top: 24px;
+    box-shadow: 0 6px 20px rgba(240,165,0,0.3);
+    transition: all 0.2s;
+  }
+  .restart-btn:hover { transform: scale(1.05); }
+
+  /* Stars rating */
+  .stars { font-size: 2.5rem; margin: 6px 0; letter-spacing: 4px; }
+
+  /* Animations */
+  @keyframes popIn {
+    from { opacity:0; transform: scale(0.7); }
+    to   { opacity:1; transform: scale(1); }
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform: translateY(40px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  @keyframes correctPop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-7px); }
+    40%      { transform: translateX(7px); }
+    60%      { transform: translateX(-5px); }
+    80%      { transform: translateX(5px); }
+  }
+
+  /* Score pill top-right */
+  .score-pill {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: #f0f7ff;
+    border: 2px solid #dde8f5;
+    border-radius: 99px;
+    padding: 4px 16px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    color: var(--blue);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⏰ What's the Time?</h1>
+    <p>Look at the clock and choose the digital time!</p>
+  </header>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <div class="quiz-card" id="quizCard">
+    <div class="score-pill" id="scorePill">⭐ 0</div>
+    <div class="question-label" id="qLabel">Question 1 of 8</div>
+    <div class="question-text" id="qText">What time is shown on the clock?</div>
+    <div class="clock-wrap">
+      <svg class="clock-svg" id="clockSvg" width="200" height="200" viewBox="0 0 200 200"></svg>
+    </div>
+    <div class="options" id="optionsGrid"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next ➜</button>
+  </div>
+</div>
+
+<script>
+// Questions: each has hours, minutes, and options (one correct)
+// Types: o'clock, half past, quarter past, quarter to
+const ALL_QUESTIONS = [
+  { h:3,  m:0,  label:"3:00",  correct:"3:00",  opts:["3:00","5:00","6:00","9:00"],    hint:"The long hand points to 12!" },
+  { h:7,  m:0,  label:"7:00",  correct:"7:00",  opts:["7:00","1:00","11:00","5:00"],   hint:"The short hand points to 7!" },
+  { h:12, m:0,  label:"12:00", correct:"12:00", opts:["12:00","6:00","3:00","9:00"],   hint:"Both hands point to 12!" },
+  { h:6,  m:30, label:"6:30",  correct:"6:30",  opts:["6:30","6:00","12:30","3:30"],   hint:"Half past 6 — the long hand points to 6!" },
+  { h:2,  m:30, label:"2:30",  correct:"2:30",  opts:["2:30","3:30","2:00","8:30"],    hint:"Half past 2! The long hand is on 6." },
+  { h:9,  m:15, label:"9:15",  correct:"9:15",  opts:["9:15","9:30","3:15","9:00"],    hint:"Quarter past 9 — long hand on 3!" },
+  { h:4,  m:15, label:"4:15",  correct:"4:15",  opts:["4:15","4:45","1:15","4:30"],    hint:"Quarter past 4! Long hand on 3." },
+  { h:11, m:45, label:"11:45", correct:"11:45", opts:["11:45","11:15","12:45","11:30"],hint:"Quarter to 12 — long hand on 9!" },
+  { h:1,  m:30, label:"1:30",  correct:"1:30",  opts:["1:30","7:30","1:00","6:30"],    hint:"Half past 1! Long hand points down to 6." },
+  { h:5,  m:0,  label:"5:00",  correct:"5:00",  opts:["5:00","7:00","10:00","2:00"],   hint:"The short hand points to 5!" },
+];
+
+// Shuffle helper
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let questions, current, score;
+
+function init() {
+  questions = shuffle(ALL_QUESTIONS).slice(0, 8);
+  current = 0;
+  score = 0;
+  document.getElementById('quizCard').innerHTML = `
+    <div class="score-pill" id="scorePill">⭐ 0</div>
+    <div class="question-label" id="qLabel">Question 1 of 8</div>
+    <div class="question-text" id="qText">What time is shown on the clock?</div>
+    <div class="clock-wrap">
+      <svg class="clock-svg" id="clockSvg" width="200" height="200" viewBox="0 0 200 200"></svg>
+    </div>
+    <div class="options" id="optionsGrid"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next ➜</button>
+  `;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('progressFill').style.width = `${(current/8)*100}%`;
+  document.getElementById('qLabel').textContent = `Question ${current+1} of 8`;
+  document.getElementById('scorePill').textContent = `⭐ ${score}`;
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('nextBtn').className = 'next-btn';
+
+  drawClock(q.h % 12, q.m);
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  shuffle(q.opts).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt, q.correct, q.hint);
+    grid.appendChild(btn);
+  });
+}
+
+function drawClock(h, m) {
+  const svg = document.getElementById('clockSvg');
+  const cx = 100, cy = 100, r = 92;
+
+  // Build tick marks and numbers
+  let ticks = '';
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 2 * Math.PI - Math.PI / 2;
+    const isMajor = i % 5 === 0;
+    const outer = r - 4;
+    const inner = isMajor ? outer - 14 : outer - 7;
+    ticks += `<line 
+      x1="${cx + Math.cos(angle)*outer}" y1="${cy + Math.sin(angle)*outer}"
+      x2="${cx + Math.cos(angle)*inner}" y2="${cy + Math.sin(angle)*inner}"
+      stroke="${isMajor ? '#4a90d9' : '#c5d8ee'}" 
+      stroke-width="${isMajor ? 2.5 : 1.2}" 
+      stroke-linecap="round"/>`;
+  }
+
+  let nums = '';
+  for (let i = 1; i <= 12; i++) {
+    const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
+    const nr = r - 26;
+    nums += `<text 
+      x="${cx + Math.cos(angle)*nr}" 
+      y="${cy + Math.sin(angle)*nr + 5}"
+      text-anchor="middle" 
+      font-family="Fredoka One, cursive" 
+      font-size="16" 
+      fill="#2d3a4a">${i}</text>`;
+  }
+
+  // Hands
+  const minAngle  = (m / 60) * 2 * Math.PI - Math.PI / 2;
+  const hourAngle = ((h + m/60) / 12) * 2 * Math.PI - Math.PI / 2;
+
+  const hx = cx + Math.cos(hourAngle) * 52;
+  const hy = cy + Math.sin(hourAngle) * 52;
+  const mx = cx + Math.cos(minAngle) * 72;
+  const my = cy + Math.sin(minAngle) * 72;
+
+  // Back of hour hand
+  const hbx = cx - Math.cos(hourAngle) * 14;
+  const hby = cy - Math.sin(hourAngle) * 14;
+  const mbx = cx - Math.cos(minAngle) * 14;
+  const mby = cy - Math.sin(minAngle) * 14;
+
+  svg.innerHTML = `
+    <!-- Face -->
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="white" stroke="#dde8f5" stroke-width="3"/>
+    <circle cx="${cx}" cy="${cy}" r="${r-3}" fill="none" stroke="#eef4ff" stroke-width="6"/>
+    ${ticks}
+    ${nums}
+    <!-- Hour hand -->
+    <line x1="${hbx}" y1="${hby}" x2="${hx}" y2="${hy}" 
+      stroke="#2d3a4a" stroke-width="7" stroke-linecap="round"/>
+    <!-- Minute hand -->
+    <line x1="${mbx}" y1="${mby}" x2="${mx}" y2="${my}" 
+      stroke="#4a90d9" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Centre dot -->
+    <circle cx="${cx}" cy="${cy}" r="7" fill="#4a90d9"/>
+    <circle cx="${cx}" cy="${cy}" r="3" fill="white"/>
+  `;
+}
+
+function checkAnswer(chosen, correct, hint) {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+    if (b.textContent === chosen && chosen !== correct) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback');
+  if (chosen === correct) {
+    score++;
+    document.getElementById('scorePill').textContent = `⭐ ${score}`;
+    fb.textContent = `🎉 Brilliant! The time is ${correct}!`;
+    fb.className = 'feedback show good';
+  } else {
+    fb.textContent = `💡 Not quite! ${hint} The answer is ${correct}.`;
+    fb.className = 'feedback show bad';
+  }
+  document.getElementById('nextBtn').className = 'next-btn visible';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= 8) {
+    showScore();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showScore() {
+  document.getElementById('progressFill').style.width = '100%';
+  const pct = score / 8;
+  let trophy, msg, stars;
+  if (pct === 1)        { trophy='🏆'; msg="Perfect score! You're a time superstar!"; stars='⭐⭐⭐'; }
+  else if (pct >= 0.75) { trophy='🥇'; msg="Amazing work! Almost perfect!"; stars='⭐⭐⭐'; }
+  else if (pct >= 0.5)  { trophy='🥈'; msg="Good effort! Keep practising!"; stars='⭐⭐'; }
+  else                  { trophy='🌟'; msg="Keep going — you'll get there!"; stars='⭐'; }
+
+  document.getElementById('quizCard').innerHTML = `
+    <div class="score-screen">
+      <div class="trophy">${trophy}</div>
+      <h2>Well done!</h2>
+      <div class="stars">${stars}</div>
+      <p>You scored</p>
+      <div class="score-num">${score} / 8</div>
+      <p>${msg}</p>
+      <button class="restart-btn" onclick="init()">Try Again 🔄</button>
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>
