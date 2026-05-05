@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miss Uko's Time Quiz ⏰</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#4fc3f7; --sun:#FFD54F; --grass:#66BB6A; --coral:#FF7043;
+  --purple:#AB47BC; --dark:#1a237e; --pink:#e91e8c;
+  --shadow:0 8px 32px rgba(26,35,126,0.13);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(160deg,#e3f2fd 0%,#fff9c4 50%,#e8f5e9 100%);min-height:100vh;overflow-x:hidden;}
+
+/* LOGO */
+.logo{
+  position:fixed;top:14px;right:18px;z-index:9999;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.logo-circle{
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.55rem;
+  box-shadow:0 4px 14px rgba(171,71,188,0.45);
+  border:3px solid #fff;
+  animation:logoPop 0.8s cubic-bezier(.34,1.56,.64,1) both;
+}
+.logo-name{
+  font-family:'Baloo 2',cursive;font-size:0.62rem;font-weight:800;
+  color:var(--dark);background:#fff;padding:2px 8px;border-radius:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.12);letter-spacing:0.5px;text-align:center;
+  white-space:nowrap;
+}
+@keyframes logoPop{from{opacity:0;transform:scale(0.3)}to{opacity:1;transform:scale(1)}}
+
+/* CLOUDS */
+.cloud{position:fixed;border-radius:50px;background:rgba(255,255,255,0.7);opacity:0.6;pointer-events:none;animation:floatCloud linear infinite;}
+.cloud::before,.cloud::after{content:'';position:absolute;background:rgba(255,255,255,0.7);border-radius:50%;}
+.cloud1{width:110px;height:38px;top:6%;animation-duration:30s;animation-delay:-4s;}
+.cloud1::before{width:55px;height:55px;top:-28px;left:14px;}
+.cloud1::after{width:75px;height:46px;top:-18px;left:38px;}
+.cloud2{width:85px;height:28px;top:20%;animation-duration:38s;animation-delay:-14s;}
+.cloud2::before{width:42px;height:42px;top:-20px;left:9px;}
+.cloud2::after{width:56px;height:35px;top:-12px;left:28px;}
+.cloud3{width:140px;height:44px;top:65%;animation-duration:44s;animation-delay:-22s;}
+.cloud3::before{width:65px;height:65px;top:-32px;left:16px;}
+.cloud3::after{width:85px;height:54px;top:-22px;left:52px;}
+@keyframes floatCloud{from{transform:translateX(-260px)}to{transform:translateX(110vw)}}
+
+/* HEADER */
+header{text-align:center;padding:38px 80px 14px 20px;position:relative;z-index:10;}
+.title-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--dark);color:var(--sun);
+  font-family:'Baloo 2',cursive;font-size:1.9rem;font-weight:800;
+  padding:12px 32px;border-radius:60px;
+  box-shadow:0 6px 0 #0d0a4a,var(--shadow);
+  animation:popIn 0.7s cubic-bezier(.34,1.56,.64,1) both;
+}
+.tick{font-size:2rem;animation:tickTock 1s ease-in-out infinite alternate;display:inline-block;}
+@keyframes tickTock{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes popIn{from{opacity:0;transform:scale(0.5) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.subtitle{margin-top:10px;font-size:1rem;color:var(--dark);font-weight:700;opacity:0.8;animation:fadeUp 0.7s 0.3s both;}
+
+.progress-wrap{max-width:580px;margin:18px auto 0;background:rgba(255,255,255,0.6);border-radius:20px;height:16px;overflow:hidden;box-shadow:inset 0 2px 6px rgba(0,0,0,0.1);position:relative;z-index:10;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--grass),var(--sky));border-radius:20px;transition:width 0.5s cubic-bezier(.34,1.56,.64,1);}
+.progress-label{text-align:center;font-size:0.85rem;color:var(--dark);font-weight:700;margin-top:5px;opacity:0.7;}
+
+/* SECTION HEADER */
+.section-header{
+  max-width:680px;margin:10px auto 0;padding:0 18px;
+  text-align:center;position:relative;z-index:10;
+}
+.section-pill{
+  display:inline-block;font-family:'Baloo 2',cursive;font-size:0.9rem;font-weight:800;
+  padding:6px 22px;border-radius:30px;letter-spacing:1px;text-transform:uppercase;
+  animation:fadeUp 0.4s ease both;
+}
+.pill-a{background:#fce4ec;color:#880e4f;border:2px solid #f48fb1;}
+.pill-b{background:#e8eaf6;color:#283593;border:2px solid #9fa8da;}
+
+/* MAIN */
+main{max-width:680px;margin:22px auto 70px;padding:0 16px;position:relative;z-index:10;}
+
+/* QUESTION CARD */
+.question-card{
+  background:#fff;border-radius:26px;
+  box-shadow:var(--shadow),0 2px 0 #dce0ff;
+  padding:26px 30px 32px;
+  animation:cardSlide 0.5s cubic-bezier(.34,1.56,.64,1) both;
+  position:relative;overflow:hidden;
+}
+.question-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--sky),var(--purple),var(--coral),var(--sun));border-radius:26px 26px 0 0;}
+@keyframes cardSlide{from{opacity:0;transform:translateY(38px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.q-num{font-family:'Baloo 2',cursive;font-size:0.8rem;font-weight:800;color:var(--sky);text-transform:uppercase;letter-spacing:2px;}
+.q-badge{font-family:'Baloo 2',cursive;font-size:0.7rem;font-weight:800;padding:3px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;}
+.badge-read{background:#fce4ec;color:#880e4f;border:1.5px solid #f48fb1;}
+.badge-pick{background:#e8eaf6;color:#283593;border:1.5px solid #9fa8da;}
+
+.q-text{font-family:'Baloo 2',cursive;font-size:1.35rem;font-weight:700;color:var(--dark);line-height:1.4;margin-bottom:20px;}
+
+/* ── SINGLE ANALOGUE CLOCK ── */
+.clock-display{display:flex;justify-content:center;margin:4px 0 20px;}
+
+/* ── PICK-THE-CLOCK GRID ── */
+.pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px;}
+.pick-option{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:#f8f9ff;border:3px solid #e0e7ff;border-radius:18px;
+  padding:16px 10px;cursor:pointer;transition:all 0.18s ease;
+  position:relative;
+}
+.pick-option:hover:not(.disabled){border-color:var(--sky);background:#e3f2fd;transform:translateY(-3px);box-shadow:0 6px 18px rgba(79,195,247,0.22);}
+.pick-option.correct{background:#e8f5e9;border-color:var(--grass);animation:boing 0.4s ease;}
+.pick-option.wrong{background:#fce4ec;border-color:#e53935;animation:shake 0.4s ease;}
+.pick-option.disabled{pointer-events:none;}
+.pick-label{font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;color:var(--dark);}
+.pick-letter{
+  position:absolute;top:8px;left:12px;
+  font-family:'Baloo 2',cursive;font-size:0.72rem;font-weight:800;
+  color:#fff;background:var(--dark);
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── TEXT OPTIONS (Section A) ── */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.option-btn{
+  font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;
+  padding:14px 10px;border-radius:16px;
+  border:3px solid #e0e0e0;background:#f8f9ff;
+  color:var(--dark);cursor:pointer;
+  transition:all 0.18s ease;text-align:center;line-height:1.3;
+}
+.option-btn:hover:not(:disabled){border-color:var(--sky);background:#e3f2fd;transform:translateY(-3px);box-shadow:0 6px 18px rgba(79,195,247,0.22);}
+.option-btn.correct{background:#e8f5e9;border-color:var(--grass);color:#2e7d32;animation:boing 0.4s ease;}
+.option-btn.wrong{background:#fce4ec;border-color:#e53935;color:#c62828;animation:shake 0.4s ease;}
+
+@keyframes boing{0%,100%{transform:scale(1)}40%{transform:scale(1.08)}70%{transform:scale(0.96)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* FEEDBACK */
+.feedback{margin-top:16px;padding:13px 16px;border-radius:13px;font-size:0.93rem;font-weight:700;display:none;align-items:center;gap:10px;animation:fadeUp 0.3s ease both;}
+.feedback.show{display:flex;}
+.feedback.correct-fb{background:#e8f5e9;color:#2e7d32;}
+.feedback.wrong-fb{background:#fce4ec;color:#c62828;}
+.fb-icon{font-size:1.5rem;flex-shrink:0;}
+
+/* NEXT BUTTON */
+.next-btn{margin-top:18px;width:100%;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;padding:13px;border-radius:16px;border:none;background:var(--dark);color:var(--sun);cursor:pointer;box-shadow:0 5px 0 #0d0a4a;transition:all 0.15s ease;display:none;letter-spacing:0.5px;}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 #0d0a4a;}
+.next-btn:active{transform:translateY(2px);box-shadow:0 3px 0 #0d0a4a;}
+.next-btn.show{display:block;animation:fadeUp 0.3s 0.1s ease both;}
+
+/* SCORE SCREEN */
+.score-screen{background:#fff;border-radius:26px;box-shadow:var(--shadow);padding:44px 32px;text-align:center;display:none;animation:cardSlide 0.6s cubic-bezier(.34,1.56,.64,1) both;}
+.score-screen.show{display:block;}
+.trophy{font-size:4.5rem;display:block;animation:bounce 1s ease infinite alternate;margin-bottom:8px;}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+.score-title{font-family:'Baloo 2',cursive;font-size:1.9rem;font-weight:800;color:var(--dark);margin-bottom:8px;}
+.score-number{font-family:'Baloo 2',cursive;font-size:4rem;font-weight:800;color:var(--coral);line-height:1;}
+.score-total{font-size:1.3rem;color:#888;font-weight:700;}
+.score-msg{margin:12px 0 24px;font-size:1rem;color:#555;font-weight:600;}
+.breakdown{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:26px;}
+.bd-item{background:#f8f9ff;border-radius:14px;padding:12px 18px;font-family:'Baloo 2',cursive;font-weight:800;font-size:0.9rem;color:var(--dark);border:2px solid #e0e0e0;}
+.bd-item span{display:block;font-size:1.4rem;color:var(--coral);}
+.restart-btn{font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;padding:13px 42px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--sky),var(--purple));color:#fff;cursor:pointer;box-shadow:0 5px 0 #4a148c;transition:all 0.15s ease;}
+.restart-btn:hover{transform:translateY(-2px);}
+
+/* STARS */
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden;}
+.star{position:absolute;font-size:1.4rem;animation:starFall 1.5s ease both;opacity:0;}
+@keyframes starFall{0%{opacity:1;transform:translateY(-20px) scale(0.5) rotate(0deg)}70%{opacity:1}100%{opacity:0;transform:translateY(80px) scale(1.3) rotate(360deg)}}
+
+@media(max-width:480px){
+  .title-badge{font-size:1.4rem;padding:10px 20px;}
+  .question-card{padding:20px 16px 24px;}
+  .q-text{font-size:1.1rem;}
+  .pick-grid{grid-template-columns:1fr 1fr;}
+  .options-grid{grid-template-columns:1fr;}
+  .analog-clock{width:130px;height:130px;}
+  .minute-hand{height:46px;}
+  .hour-hand{height:34px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGO -->
+<div class="logo">
+  <div class="logo-circle">👩🏾‍🏫</div>
+  <div class="logo-name">Miss Uko</div>
+</div>
+
+<!-- CLOUDS -->
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+<div class="cloud cloud3"></div>
+<div class="stars" id="stars"></div>
+
+<header>
+  <div class="title-badge"><span class="tick">⏰</span> Miss Uko's Time Quiz</div>
+  <p class="subtitle">40 Questions · Read the Clock · Pick the Right Clock</p>
+  <div class="progress-wrap"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+  <p class="progress-label" id="progressLabel">Question 1 of 40</p>
+</header>
+
+<div class="section-header" id="sectionHeader"></div>
+
+<main>
+  <div class="question-card" id="questionCard">
+    <div class="q-meta">
+      <span class="q-num" id="qNum">Q1 of 40</span>
+      <span class="q-badge" id="qBadge"></span>
+    </div>
+    <div class="q-text" id="qText"></div>
+    <div id="visualArea"></div>
+    <div id="answersArea"></div>
+    <div class="feedback" id="feedback"><span class="fb-icon" id="fbIcon"></span><span id="fbText"></span></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">Next Question →</button>
+  </div>
+
+  <div class="score-screen" id="scoreScreen">
+    <span class="trophy" id="trophy">🏆</span>
+    <div class="score-title" id="scoreTitle">Brilliant!</div>
+    <div class="score-number" id="scoreNum">0</div>
+    <div class="score-total">out of 40</div>
+    <p class="score-msg" id="scoreMsg"></p>
+    <div class="breakdown" id="breakdown"></div>
+    <button class="restart-btn" onclick="restart()">🔄 Try Again!</button>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════
+   HELPER: build an SVG-style clock using a DIV
+═══════════════════════════════════════════════ */
+function clockHTML(h, m, id='clk') {
+  const size = 148;
+  const cx = size/2, cy = size/2, r = size/2;
+  const hr = ((h % 12) * 30 + m * 0.5);
+  const mr = m * 6;
+  // Random plausible seconds for realism
+  const sr = (Math.floor(Math.random()*60)) * 6;
+
+  function polar(angleDeg, radius) {
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return [cx + radius * Math.cos(rad), cy + radius * Math.sin(rad)];
+  }
+
+  // Tick marks
+  let ticks = '';
+  for (let i = 0; i < 60; i++) {
+    const a = i * 6;
+    const isHour = i % 5 === 0;
+    const outer = r - 3;
+    const inner = isHour ? r - 13 : r - 8;
+    const [x1,y1] = polar(a, outer);
+    const [x2,y2] = polar(a, inner);
+    const color = isHour ? '#1a237e' : '#c0392b';
+    const sw = isHour ? 3 : 1.5;
+    // Hour marks: small square (rect), minute marks: thin line
+    if (isHour) {
+      // draw a small square rotated at angle
+      const mid = polar(a, (outer+inner)/2);
+      ticks += `<rect x="${mid[0]-2}" y="${mid[1]-5}" width="4" height="10"
+        fill="#1a237e"
+        transform="rotate(${a},${mid[0]},${mid[1]})" rx="0.5"/>`;
+    } else {
+      ticks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+        stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    }
+  }
+
+  // Numbers
+  const nums = [12,1,2,3,4,5,6,7,8,9,10,11];
+  let numsSVG = nums.map((n,i) => {
+    const a = i * 30;
+    const [nx,ny] = polar(a, r - 26);
+    return `<text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central"
+      font-family="Nunito,sans-serif" font-size="13" font-weight="800" fill="#1a237e">${n}</text>`;
+  }).join('');
+
+  // Hour hand
+  function hand(angleDeg, length, width, color, linecap='round') {
+    const [x2,y2] = polar(angleDeg, length);
+    const [xb,yb] = polar(angleDeg+180, 10); // small tail
+    return `<line x1="${xb}" y1="${yb}" x2="${x2}" y2="${y2}"
+      stroke="${color}" stroke-width="${width}" stroke-linecap="${linecap}"/>`;
+  }
+
+  const hourHand  = hand(hr, r*0.52, 5.5, '#1a237e');
+  const minHand   = hand(mr, r*0.70, 3.5, '#1a237e');
+  const secHand   = hand(sr, r*0.74, 1.5, '#c0392b');
+  const secTail   = hand(sr+180, r*0.18, 1.5, '#c0392b');
+
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"
+    style="filter:drop-shadow(0 4px 14px rgba(26,35,126,0.18));border-radius:50%;" id="${id}">
+    <!-- Outer shadow ring -->
+    <circle cx="${cx}" cy="${cy}" r="${r-1}" fill="white" stroke="#dde" stroke-width="2"/>
+    <!-- Inner face -->
+    <circle cx="${cx}" cy="${cy}" r="${r-5}" fill="#f5f6fa"/>
+    <!-- Ticks -->
+    ${ticks}
+    <!-- Numbers -->
+    ${numsSVG}
+    <!-- Hands -->
+    ${hourHand}
+    ${minHand}
+    ${secHand}
+    ${secTail}
+    <!-- Centre cap -->
+    <circle cx="${cx}" cy="${cy}" r="5" fill="#c0392b"/>
+    <circle cx="${cx}" cy="${cy}" r="2.5" fill="#fff"/>
+  </svg>`;
+}
+
+/* ═══════════════════════════════════════════════
+   QUESTIONS
+   section: 'A' = read the clock, 'B' = pick the clock
+═══════════════════════════════════════════════ */
+const Qs = [
+// ─── SECTION A: READ THE CLOCK (Q1–20) ───────────────────────────────────
+// All answers are tricky non-standard digital times (not on the 5-minute mark)
+
+{s:'A',sub:'read-digital',h:8,m:24,
+ q:"Look carefully at the clock. The minute hand is between 4 and 5. What is the exact digital time?",
+ opts:["8:20","8:24","8:28","8:04"],c:1,
+ fb:"The minute hand is 4 tiny marks past the 4 (which = 20 mins). 20 + 4 = 24 minutes. The time is 8:24!"},
+
+{s:'A',sub:'read-digital',h:10,m:43,
+ q:"The minute hand is just past the 8. Count the extra minutes carefully. What is the digital time?",
+ opts:["10:40","10:45","10:43","10:38"],c:2,
+ fb:"The 8 on the clock = 40 minutes. The hand is 3 small marks past it: 40 + 3 = 43. The time is 10:43!"},
+
+{s:'A',sub:'read-digital',h:4,m:17,
+ q:"Look at the clock. The minute hand is just past the 3. What is the exact digital time?",
+ opts:["4:15","4:13","4:17","4:07"],c:2,
+ fb:"The 3 on the clock = 15 minutes. The hand is 2 small marks past: 15 + 2 = 17. The time is 4:17!"},
+
+{s:'A',sub:'read-digital',h:7,m:38,
+ q:"The minute hand is between the 7 and 8. What is the exact digital time?",
+ opts:["7:35","7:38","7:40","7:36"],c:1,
+ fb:"The 7 = 35 minutes. The hand is 3 small marks past it: 35 + 3 = 38. The time is 7:38!"},
+
+{s:'A',sub:'read-digital',h:11,m:52,
+ q:"The minute hand is between the 10 and 11. Count carefully. What is the digital time?",
+ opts:["11:54","11:48","11:50","11:52"],c:3,
+ fb:"The 10 = 50 minutes. The hand is 2 small marks past: 50 + 2 = 52. The time is 11:52!"},
+
+{s:'A',sub:'read-digital',h:2,m:9,
+ q:"The minute hand has just moved past 12. What is the exact digital time?",
+ opts:["2:09","2:45","2:01","2:19"],c:0,
+ fb:"The minute hand is 9 small marks past the 12. That's 9 minutes. The time is 2:09!"},
+
+{s:'A',sub:'read-digital',h:6,m:47,
+ q:"The minute hand is close to the 10 but hasn't reached it. What is the digital time?",
+ opts:["6:45","6:49","6:47","6:50"],c:2,
+ fb:"The 9 = 45 minutes. The hand is 2 small marks past: 45 + 2 = 47. The time is 6:47!"},
+
+{s:'A',sub:'read-digital',h:9,m:14,
+ q:"The minute hand is just before the 3. What is the exact digital time?",
+ opts:["9:15","9:12","9:14","9:16"],c:2,
+ fb:"The 2 = 10 minutes. The hand is 4 small marks past it: 10 + 4 = 14. The time is 9:14!"},
+
+{s:'A',sub:'read-digital',h:3,m:57,
+ q:"The minute hand is very close to the 12 but hasn't reached it. What is the digital time?",
+ opts:["3:55","3:57","4:03","3:59"],c:1,
+ fb:"The 11 = 55 minutes. The hand is 2 small marks past: 55 + 2 = 57. The time is 3:57!"},
+
+{s:'A',sub:'read-digital',h:5,m:31,
+ q:"The minute hand has just moved past the 6. What is the exact digital time?",
+ opts:["5:30","5:35","5:31","5:36"],c:2,
+ fb:"The 6 = 30 minutes. The hand is 1 small mark past it: 30 + 1 = 31. The time is 5:31!"},
+
+{s:'A',sub:'read-digital',h:12,m:26,
+ q:"The minute hand is between the 5 and 6. What is the exact digital time?",
+ opts:["12:25","12:24","12:28","12:26"],c:3,
+ fb:"The 5 = 25 minutes. The hand is 1 small mark past it: 25 + 1 = 26. The time is 12:26!"},
+
+{s:'A',sub:'read-digital',h:8,m:53,
+ q:"The minute hand is between the 10 and 11. Count the small marks. What is the digital time?",
+ opts:["8:50","8:53","8:55","8:51"],c:1,
+ fb:"The 10 = 50 minutes. The hand is 3 small marks past: 50 + 3 = 53. The time is 8:53!"},
+
+{s:'A',sub:'read-digital',h:1,m:29,
+ q:"The minute hand is just before the 6. What is the exact digital time?",
+ opts:["1:25","1:30","1:28","1:29"],c:3,
+ fb:"The 5 = 25 minutes. The hand is 4 small marks past: 25 + 4 = 29. The time is 1:29!"},
+
+{s:'A',sub:'read-digital',h:10,m:6,
+ q:"The minute hand has just moved past the 1. What is the exact digital time?",
+ opts:["10:01","10:06","10:11","10:16"],c:1,
+ fb:"The 1 = 5 minutes. The hand is 1 small mark past it: 5 + 1 = 6. The time is 10:06!"},
+
+{s:'A',sub:'read-digital',h:7,m:44,
+ q:"The minute hand is between the 8 and 9. What is the exact digital time?",
+ opts:["7:42","7:46","7:44","7:48"],c:2,
+ fb:"The 8 = 40 minutes. The hand is 4 small marks past: 40 + 4 = 44. The time is 7:44!"},
+
+{s:'A',sub:'read-digital',h:3,m:18,
+ q:"The minute hand is just past the 3. Count the small marks. What is the digital time?",
+ opts:["3:13","3:18","3:15","3:20"],c:1,
+ fb:"The 3 = 15 minutes. The hand is 3 small marks past: 15 + 3 = 18. The time is 3:18!"},
+
+{s:'A',sub:'read-digital',h:11,m:37,
+ q:"The minute hand is between the 7 and 8. What is the exact digital time?",
+ opts:["11:35","11:39","11:37","11:42"],c:2,
+ fb:"The 7 = 35 minutes. The hand is 2 small marks past: 35 + 2 = 37. The time is 11:37!"},
+
+{s:'A',sub:'read-digital',h:6,m:22,
+ q:"The minute hand is between the 4 and 5. What is the exact digital time?",
+ opts:["6:20","6:22","6:24","6:18"],c:1,
+ fb:"The 4 = 20 minutes. The hand is 2 small marks past: 20 + 2 = 22. The time is 6:22!"},
+
+{s:'A',sub:'read-digital',h:9,m:49,
+ q:"The minute hand is just past the 9. What is the exact digital time?",
+ opts:["9:45","9:47","9:51","9:49"],c:3,
+ fb:"The 9 = 45 minutes. The hand is 4 small marks past: 45 + 4 = 49. The time is 9:49!"},
+
+{s:'A',sub:'read-digital',h:4,m:33,
+ q:"The minute hand is between the 6 and 7. Count carefully. What is the digital time?",
+ opts:["4:31","4:35","4:33","4:36"],c:2,
+ fb:"The 6 = 30 minutes. The hand is 3 small marks past: 30 + 3 = 33. The time is 4:33!"},
+
+// ─── SECTION B: PICK THE CLOCK (Q21–40) ──────────────────────────────────
+// Tough non-standard digital times — clocks differ by just a few minutes
+
+{s:'B',
+ q:"Which clock shows 8:24?",
+ clocks:[{h:8,m:20},{h:8,m:24},{h:8,m:29},{h:9,m:24}],c:1,
+ fb:"Clock B: minute hand is 4 small marks past the 4 (=20+4=24 mins), hour hand just past 8. That's 8:24!"},
+
+{s:'B',
+ q:"Which clock shows 10:43?",
+ clocks:[{h:10,m:40},{h:10,m:38},{h:11,m:43},{h:10,m:43}],c:3,
+ fb:"Clock D: minute hand is 3 marks past the 8 (=40+3=43 mins), hour hand between 10 & 11. That's 10:43!"},
+
+{s:'B',
+ q:"Which clock shows 4:17?",
+ clocks:[{h:4,m:15},{h:4,m:17},{h:4,m:22},{h:5,m:17}],c:1,
+ fb:"Clock B: minute hand is 2 marks past the 3 (=15+2=17 mins), hour hand just past 4. That's 4:17!"},
+
+{s:'B',
+ q:"Which clock shows 7:38?",
+ clocks:[{h:7,m:35},{h:7,m:41},{h:8,m:38},{h:7,m:38}],c:3,
+ fb:"Clock D: minute hand is 3 marks past the 7 (=35+3=38 mins), hour hand between 7 & 8. That's 7:38!"},
+
+{s:'B',
+ q:"Which clock shows 11:52?",
+ clocks:[{h:11,m:52},{h:11,m:50},{h:12,m:52},{h:11,m:57}],c:0,
+ fb:"Clock A: minute hand is 2 marks past the 10 (=50+2=52 mins), hour hand nearly at 12. That's 11:52!"},
+
+{s:'B',
+ q:"Which clock shows 2:09?",
+ clocks:[{h:2,m:5},{h:3,m:9},{h:2,m:9},{h:2,m:14}],c:2,
+ fb:"Clock C: minute hand is 9 small marks past 12 (=9 mins), hour hand just past 2. That's 2:09!"},
+
+{s:'B',
+ q:"Which clock shows 6:47?",
+ clocks:[{h:6,m:45},{h:6,m:47},{h:7,m:47},{h:6,m:42}],c:1,
+ fb:"Clock B: minute hand is 2 marks past the 9 (=45+2=47 mins), hour hand between 6 & 7. That's 6:47!"},
+
+{s:'B',
+ q:"Which clock shows 9:14?",
+ clocks:[{h:9,m:10},{h:9,m:16},{h:10,m:14},{h:9,m:14}],c:3,
+ fb:"Clock D: minute hand is 4 marks past the 2 (=10+4=14 mins), hour hand just past 9. That's 9:14!"},
+
+{s:'B',
+ q:"Which clock shows 3:57?",
+ clocks:[{h:3,m:55},{h:4,m:57},{h:3,m:57},{h:3,m:52}],c:2,
+ fb:"Clock C: minute hand is 2 marks past the 11 (=55+2=57 mins), hour hand nearly at 4. That's 3:57!"},
+
+{s:'B',
+ q:"Which clock shows 5:31?",
+ clocks:[{h:5,m:30},{h:5,m:31},{h:6,m:31},{h:5,m:36}],c:1,
+ fb:"Clock B: minute hand is 1 mark past the 6 (=30+1=31 mins), hour hand just past 5. That's 5:31!"},
+
+{s:'B',
+ q:"Which clock shows 12:26?",
+ clocks:[{h:12,m:28},{h:12,m:21},{h:1,m:26},{h:12,m:26}],c:3,
+ fb:"Clock D: minute hand is 1 mark past the 5 (=25+1=26 mins), hour hand just past 12. That's 12:26!"},
+
+{s:'B',
+ q:"Which clock shows 8:53?",
+ clocks:[{h:8,m:50},{h:8,m:53},{h:9,m:53},{h:8,m:58}],c:1,
+ fb:"Clock B: minute hand is 3 marks past the 10 (=50+3=53 mins), hour hand between 8 & 9. That's 8:53!"},
+
+{s:'B',
+ q:"Which clock shows 1:29?",
+ clocks:[{h:1,m:25},{h:2,m:29},{h:1,m:29},{h:1,m:34}],c:2,
+ fb:"Clock C: minute hand is 4 marks past the 5 (=25+4=29 mins), hour hand nearly at 2. That's 1:29!"},
+
+{s:'B',
+ q:"Which clock shows 10:06?",
+ clocks:[{h:10,m:6},{h:10,m:1},{h:11,m:6},{h:10,m:11}],c:0,
+ fb:"Clock A: minute hand is 1 mark past the 1 (=5+1=6 mins), hour hand just past 10. That's 10:06!"},
+
+{s:'B',
+ q:"Which clock shows 7:44?",
+ clocks:[{h:7,m:40},{h:7,m:44},{h:8,m:44},{h:7,m:49}],c:1,
+ fb:"Clock B: minute hand is 4 marks past the 8 (=40+4=44 mins), hour hand between 7 & 8. That's 7:44!"},
+
+{s:'B',
+ q:"Which clock shows 3:18?",
+ clocks:[{h:3,m:15},{h:4,m:18},{h:3,m:23},{h:3,m:18}],c:3,
+ fb:"Clock D: minute hand is 3 marks past the 3 (=15+3=18 mins), hour hand just past 3. That's 3:18!"},
+
+{s:'B',
+ q:"Which clock shows 11:37?",
+ clocks:[{h:11,m:35},{h:11,m:37},{h:12,m:37},{h:11,m:32}],c:1,
+ fb:"Clock B: minute hand is 2 marks past the 7 (=35+2=37 mins), hour hand between 11 & 12. That's 11:37!"},
+
+{s:'B',
+ q:"Which clock shows 6:22?",
+ clocks:[{h:6,m:27},{h:7,m:22},{h:6,m:22},{h:6,m:17}],c:2,
+ fb:"Clock C: minute hand is 2 marks past the 4 (=20+2=22 mins), hour hand just past 6. That's 6:22!"},
+
+{s:'B',
+ q:"Which clock shows 9:49?",
+ clocks:[{h:9,m:45},{h:9,m:49},{h:10,m:49},{h:9,m:54}],c:1,
+ fb:"Clock B: minute hand is 4 marks past the 9 (=45+4=49 mins), hour hand between 9 & 10. That's 9:49!"},
+
+{s:'B',
+ q:"Which clock shows 4:33?",
+ clocks:[{h:4,m:38},{h:5,m:33},{h:4,m:28},{h:4,m:33}],c:3,
+ fb:"Clock D: minute hand is 3 marks past the 6 (=30+3=33 mins), hour hand between 4 & 5. That's 4:33!"},
+];
+
+let cur=0, score=0, answered=false;
+let sA=0, sB=0;
+const letters=['A','B','C','D'];
+
+function drawSingleClock(h,m){
+  document.getElementById('visualArea').innerHTML=`<div class="clock-display">${clockHTML(h,m,'sc')}</div>`;
+}
+
+function renderPickClocks(clocks){
+  let html='<div class="pick-grid">';
+  clocks.forEach((c,i)=>{
+    html+=`<div class="pick-option" id="po${i}" onclick="pickClock(${i})">
+      <div class="pick-letter">${letters[i]}</div>
+      ${clockHTML(c.h,c.m,'pc'+i)}
+      <div class="pick-label">${letters[i]}</div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('answersArea').innerHTML=html;
+}
+
+function renderTextOptions(opts){
+  let html='<div class="options-grid">';
+  opts.forEach((o,i)=>{
+    html+=`<button class="option-btn" id="ob${i}" onclick="pickText(${i})">${o}</button>`;
+  });
+  html+='</div>';
+  document.getElementById('answersArea').innerHTML=html;
+}
+
+function loadQ(){
+  answered=false;
+  const q=Qs[cur], total=Qs.length;
+  document.getElementById('qNum').textContent=`Q${cur+1} of ${total}`;
+  document.getElementById('progressLabel').textContent=`Question ${cur+1} of ${total}`;
+  document.getElementById('progressBar').style.width=`${(cur/total)*100}%`;
+
+  // section header
+  const sh=document.getElementById('sectionHeader');
+  if(cur===0){sh.innerHTML=`<span class="section-pill pill-a">📖 Section A — Read the Clock (Q1–20)</span>`;}
+  else if(cur===20){sh.innerHTML=`<span class="section-pill pill-b">🎯 Section B — Pick the Right Clock (Q21–40)</span>`;}
+  else{sh.innerHTML='';}
+
+  // badge
+  const badge=document.getElementById('qBadge');
+  if(q.s==='A'){badge.className='q-badge badge-read';badge.textContent='Read the Clock';}
+  else{badge.className='q-badge badge-pick';badge.textContent='Pick the Clock';}
+
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('nextBtn').className='next-btn';
+
+  // visual + answers
+  if(q.s==='A'){
+    drawSingleClock(q.h,q.m);
+    renderTextOptions(q.opts);
+  } else {
+    document.getElementById('visualArea').innerHTML='';
+    renderPickClocks(q.clocks);
+  }
+
+  // animate card
+  const card=document.getElementById('questionCard');
+  card.style.animation='none'; card.offsetHeight;
+  card.style.animation='cardSlide 0.5s cubic-bezier(.34,1.56,.64,1) both';
+}
+
+function showFeedback(correct, fb){
+  const el=document.getElementById('feedback');
+  document.getElementById('fbIcon').textContent=correct?'⭐':'💡';
+  document.getElementById('fbText').textContent=(correct?'✅ Correct! ':'❌ Not quite! ')+fb;
+  el.className='feedback '+(correct?'correct-fb':'wrong-fb')+' show';
+  document.getElementById('nextBtn').className='next-btn show';
+  if(correct) showStars();
+}
+
+function pickText(idx){
+  if(answered) return;
+  answered=true;
+  const q=Qs[cur];
+  document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+  document.getElementById('ob'+q.c).classList.add('correct');
+  if(idx!==q.c) document.getElementById('ob'+idx).classList.add('wrong');
+  if(idx===q.c){score++;sA++;}
+  showFeedback(idx===q.c, q.fb);
+}
+
+function pickClock(idx){
+  if(answered) return;
+  answered=true;
+  const q=Qs[cur];
+  document.querySelectorAll('.pick-option').forEach(el=>el.classList.add('disabled'));
+  document.getElementById('po'+q.c).classList.add('correct');
+  if(idx!==q.c) document.getElementById('po'+idx).classList.add('wrong');
+  if(idx===q.c){score++;sB++;}
+  showFeedback(idx===q.c, q.fb);
+}
+
+function nextQ(){
+  cur++;
+  if(cur<Qs.length) loadQ();
+  else showScore();
+}
+
+function showScore(){
+  document.getElementById('questionCard').style.display='none';
+  document.getElementById('progressBar').style.width='100%';
+  document.getElementById('progressLabel').textContent='Quiz Complete! 🎉';
+  document.getElementById('sectionHeader').innerHTML='';
+  const ss=document.getElementById('scoreScreen');
+  ss.className='score-screen show';
+  document.getElementById('scoreNum').textContent=score;
+  const pct=score/40;
+  let trophy,title,msg;
+  if(pct===1){trophy='🏆';title='Perfect Score!';msg='Incredible! 40 out of 40 — you are a true Time Champion!';}
+  else if(pct>=0.875){trophy='🥇';title='Outstanding!';msg='Brilliant work! Miss Uko is very proud of you!';}
+  else if(pct>=0.7){trophy='🥈';title='Great Job!';msg='Well done! Keep practising those tricky clock hands!';}
+  else if(pct>=0.5){trophy='🥉';title='Good Try!';msg='A solid effort! Review the clocks you found tricky.';}
+  else{trophy='📚';title='Keep Practising!';msg='Clocks can be tricky — but every try makes you better!';}
+  document.getElementById('trophy').textContent=trophy;
+  document.getElementById('scoreTitle').textContent=title;
+  document.getElementById('scoreMsg').textContent=msg;
+  document.getElementById('breakdown').innerHTML=`
+    <div class="bd-item">Section A<br>Read the Clock<span>${sA}/20</span></div>
+    <div class="bd-item">Section B<br>Pick the Clock<span>${sB}/20</span></div>`;
+  showStars(28);
+}
+
+function restart(){
+  cur=0;score=0;sA=0;sB=0;
+  document.getElementById('questionCard').style.display='block';
+  document.getElementById('scoreScreen').className='score-screen';
+  loadQ();
+}
+
+function showStars(count=8){
+  const c=document.getElementById('stars');
+  const e=['⭐','🌟','✨','💫','🌈'];
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const s=document.createElement('div');
+      s.className='star';
+      s.textContent=e[Math.floor(Math.random()*e.length)];
+      s.style.left=Math.random()*95+'%';
+      s.style.top=Math.random()*80+'%';
+      s.style.animationDelay=Math.random()*0.5+'s';
+      c.appendChild(s);
+      setTimeout(()=>s.remove(),2000);
+    },i*80);
+  }
+}
+
+loadQ();
+</script>
+</body>
+</html>
