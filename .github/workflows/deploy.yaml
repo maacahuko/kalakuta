@@ -20,10 +20,18 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v4
 
+      - name: Prepare public directory
+        run: |
+          mkdir -p ./public
+          cp -r *.html ./public/ 2>/dev/null || true
+          cp -r *.css ./public/ 2>/dev/null || true
+          cp -r *.js ./public/ 2>/dev/null || true
+          cp -r assets ./public/ 2>/dev/null || true
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
+
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-
